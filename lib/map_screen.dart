@@ -21,10 +21,10 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         title: Text("Map Box Task"),
         actions: [
-          /* IconButton(
+          IconButton(
             onPressed: context.read<MapProvider>().moveToUserLocation,
             icon: Icon(Icons.location_history),
-          ), */
+          ),
           IconButton(
             onPressed: _showFiltersheet,
             icon: Icon(Icons.filter_alt),

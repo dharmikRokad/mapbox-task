@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-// import 'package:geolocator/geolocator.dart' as gl;
+import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:myapp/models/customer.dart';
 import 'package:myapp/models/enums/store_level.dart';
@@ -78,24 +78,36 @@ class MapProvider extends ChangeNotifier {
     await Future.delayed(Duration(milliseconds: 300));
     _markerManager =
         await _mapcontroller.annotations.createPointAnnotationManager();
+
+    addCurrentLocationMarker();
     await addStoreMarkers();
     await addcustomerMarkers();
+  }
+
+  void addCurrentLocationMarker() {
+    _mapcontroller.location.updateSettings(
+      LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: true,
+      ),
+    );
   }
 
   Future<void> addStoreMarkers() async {
     try {
       final List<PointAnnotationOptions> points = [];
+
       for (Store e in [..._stores.take(100)]) {
         log("stores image length => ${e.markerPath.length}");
         final point = PointAnnotationOptions(
-          symbolSortKey: 1,
           geometry: Point(
             coordinates: Position(
-              e.geoLocation.latitude,
               e.geoLocation.longitude,
+              e.geoLocation.latitude,
             ),
           ),
-          image: e.markerPath,
+          // image: e.markerPath,
+          iconImage: AppAssets.goldGreen,
         );
         points.add(point);
       }
@@ -108,28 +120,27 @@ class MapProvider extends ChangeNotifier {
   }
 
   Future<void> addcustomerMarkers() async {
-    try {
-      final List<PointAnnotationOptions> points = [];
-      for (Customer e in [..._customers.take(100)]) {
-        log("customer image length => ${e.marker.length}");
-        final point = PointAnnotationOptions(
-          symbolSortKey: 2,
-          geometry: Point(
-            coordinates: Position(
-              e.geoLocation.latitude,
-              e.geoLocation.longitude,
-            ),
-          ),
-          image: e.marker,
-        );
-        points.add(point);
-      }
-      await _markerManager.createMulti(points);
-      log("added all customer markers in the _mapController");
-    } on Exception catch (e, s) {
-      log('err - addcustomerMarkers : $e');
-      log('err - addcustomerMarkers : $s');
-    }
+    // try {
+    //   final List<PointAnnotationOptions> points = [];
+    //   for (Customer e in [..._customers.take(100)]) {
+    //     log("customer image length => ${e.marker.length}");
+    //     final point = PointAnnotationOptions(
+    //       geometry: Point(
+    //         coordinates: Position(
+    //           e.geoLocation.longitude,
+    //           e.geoLocation.latitude,
+    //         ),
+    //       ),
+    //       image: e.marker,
+    //     );
+    //     points.add(point);
+    //   }
+    //   await _markerManager.createMulti(points);
+    //   log("added all customer markers in the _mapController");
+    // } on Exception catch (e, s) {
+    //   log('err - addcustomerMarkers : $e');
+    //   log('err - addcustomerMarkers : $s');
+    // }
   }
 
   Future<void> init() async {
@@ -154,7 +165,7 @@ class MapProvider extends ChangeNotifier {
     }
   }
 
-  /* Future<void> moveToUserLocation() async {
+  Future<void> moveToUserLocation() async {
     try {
       // Request location permission
       gl.LocationPermission permission = await gl.Geolocator.checkPermission();
@@ -185,5 +196,5 @@ class MapProvider extends ChangeNotifier {
     } catch (e) {
       log("Error moving to user location: $e");
     }
-  } */
+  }
 }
